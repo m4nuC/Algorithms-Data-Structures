@@ -2,8 +2,9 @@ import sys
 import math
 
 class Heap:
-    def __init__(self, A = []):
+    def __init__(self, A = [], value_accessor = lambda x: x):
         self.heap = A
+        self.value_accessor = value_accessor
 
     def children_indexes(self, i):
         return (i*2+1, i*2+2)
@@ -11,27 +12,27 @@ class Heap:
     def get_children(self, i):
         left_i, right_i = self.children_indexes(i)
         if self.size()-1 >= right_i:
-            return [(left_i, self.heap[left_i]), (right_i, self.heap[right_i])]
+            return [(left_i, self.value_accessor(self.heap[left_i])), (right_i, self.value_accessor(self.heap[right_i]))]
         elif self.size()-1 >= left_i:
-            return [(left_i, self.heap[left_i]), (right_i, math.inf)]
+            return [(left_i, self.value_accessor(self.heap[left_i])), (right_i, math.inf)]
         else:
             return [(left_i, math.inf), (right_i, math.inf)]
 
     def get_min_child(self, i):
         left_i, right_i = self.children_indexes(i)
         if self.size()-1 >= right_i:
-            return (left_i, self.heap[left_i]) if self.heap[left_i] < self.heap[right_i] else (right_i, self.heap[right_i])
+            return (left_i, self.value_accessor(self.heap[left_i])) if self.value_accessor(self.heap[left_i] )< self.value_accessor(self.heap[right_i]) else (right_i, self.value_accessor(self.heap[right_i]))
         elif self.size()-1 >= left_i:
-            return (left_i, self.heap[left_i])
+            return (left_i, self.value_accessor(self.heap[left_i]))
         else:
             return (False, False)
 
     def get_max_child(self, i):
         left_i, right_i = self.children_indexes(i)
         if self.size()-1 >= right_i:
-            return (left_i, self.heap[left_i]) if self.heap[left_i] > self.heap[right_i] else (right_i, self.heap[right_i])
+            return (left_i, self.value_accessor(self.heap[left_i])) if self.value_accessor(self.heap[left_i] )> self.value_accessor(self.heap[right_i]) else (right_i, self.value_accessor(self.heap[right_i]))
         elif self.size()-1 >= left_i:
-            return (left_i, self.heap[left_i])
+            return (left_i, self.value_accessor(self.heap[left_i]))
         else:
             return (False, False)
 
@@ -63,9 +64,9 @@ class Heap:
             sys.stdout.write('\n')
         return ''
 
-
 class MinHeap(Heap):
-    def __init__(self, A = []):
+    def __init__(self, A = [], value_accessor = lambda x: x):
+        self.value_accessor = value_accessor
         self.heap = []
         [self.add(a) for a in A]
 
@@ -90,10 +91,9 @@ class MinHeap(Heap):
             self.swap(i, i+1)
             return self.pluck(i+1)
 
-
     def min_heapify_up(self, i):
         index, value = self.get_min_child(i)
-        if index and self.heap[i] > value:
+        if index and self.value_accessor(self.heap[i]) > value:
             self.swap(i, index)
             parent = self.parent(i)
             if parent >= 0:
@@ -101,6 +101,6 @@ class MinHeap(Heap):
 
     def min_heapify_down(self, i):
         index, value = self.get_min_child(i)
-        if index and self.heap[i] > value:
+        if index and self.value_accessor(self.heap[i]) > value:
             self.swap(i, index)
             return self.min_heapify_down(index)
