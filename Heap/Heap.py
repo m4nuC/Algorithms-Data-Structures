@@ -61,7 +61,7 @@ class Heap:
                 if cell < len(self.heap):
                     sys.stdout.write( ' {} '.format(self.heap[cell]) )
             sys.stdout.write('\n')
-        return heapified_tree
+        return ''
 
 
 class MinHeap(Heap):
@@ -78,6 +78,18 @@ class MinHeap(Heap):
         min = self.heap.pop()
         self.min_heapify_down(0)
         return min
+
+    def pluck(self, i):
+        index, value = self.get_min_child(i)
+        if i == self.size()-1:
+            return self.heap.pop(i)
+        elif index:
+            self.swap(i, index)
+            return self.pluck(index)
+        else:
+            self.swap(i, i+1)
+            return self.pluck(i+1)
+
 
     def min_heapify_up(self, i):
         index, value = self.get_min_child(i)
