@@ -37,7 +37,8 @@ class Heap:
             return (False, False)
 
     def parent(self, i):
-        return math.ceil(i/2) -1
+        index = math.ceil(i/2) -1
+        return index if index > -1 else False
 
     def add(self, x):
         self.heap.append(x)
@@ -46,6 +47,7 @@ class Heap:
         return len(self.heap)
 
     def swap(self, i, j):
+        print('swapping {} and {}'.format( self.heap[i], self.heap[j]))
         tmp = self.heap[i]
         self.heap[i] = self.heap[j]
         self.heap[j] = tmp
@@ -72,7 +74,7 @@ class MinHeap(Heap):
 
     def add(self, x):
         super().add(x)
-        self.min_heapify_up(self.parent(self.size()-1))
+        self.min_heapify_up(self.size()-1)
 
     def pluck_min(self):
         self.swap(0, self.size()-1)
@@ -92,12 +94,11 @@ class MinHeap(Heap):
             return self.pluck(i+1)
 
     def min_heapify_up(self, i):
-        index, value = self.get_min_child(i)
-        if index and self.value_accessor(self.heap[i]) > value:
-            self.swap(i, index)
-            parent = self.parent(i)
-            if parent >= 0:
-                return self.min_heapify_up(parent)
+        parent = self.parent(i)
+        if parent is False: return
+        if self.value_accessor(self.heap[i]) < self.value_accessor(self.heap[parent]):
+            self.swap(i, parent)
+            return self.min_heapify_up(parent)
 
     def min_heapify_down(self, i):
         index, value = self.get_min_child(i)
