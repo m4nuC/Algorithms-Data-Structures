@@ -10,7 +10,7 @@ class Node:
         self.data = data
 
     def __str__(self):
-        return 'Parent: {}, Left: {}, Right: {}, Data:{}'.format(self.parent, self.left, self.right, self.data)
+        return 'Idx: {}, Par: {}, L: {}, R: {}, Data:{}'.format(self.index, self.parent, self.left, self.right, self.data)
 
 class BST:
     def __init__(self, nodes = {}):
@@ -33,6 +33,22 @@ class BST:
         elif level == 2:
             return 3
         return range(2**level-1, (2**level-2) +1) + self.left_nodes(level+1)
+
+    def get_max(self):
+        node = self.nodes[1] if 1 in self.nodes else None
+        last_seen_value = node.data['value']
+        while node:
+            last_seen_value = node.data['value']
+            node = self.nodes[node.right] if node.right else None
+        return last_seen_value
+
+    def get_min(self):
+        node = self.nodes[1] if 1 in self.nodes else None
+        last_seen_value = node.data['value']
+        while node:
+            last_seen_value = node.data['value']
+            node = self.nodes[node.left] if node.left else None
+        return last_seen_value
 
     def search(self, value, current_node = 1):
         node = self.nodes[current_node] if current_node in self.nodes else None
@@ -61,10 +77,19 @@ class BST:
             while node:
                 last_seen_index = node.index
                 node = self.nodes[node.left] if node.left else None
-            new_node = Node(last_seen_index, math.ceil(last_seen_index/2)-1, None, None, {'value': value})
+            new_node = Node(last_seen_index, math.floor(last_seen_index/2), None, None, {'value': value})
+            self.nodes[new_node.parent].left = last_seen_index
         else:
-            new_node = Node(search_result[1], math.ceil(search_result[1]/2)-1, None, None, {'value': value})
+            new_node = Node(search_result[1], math.floor(search_result[1]/2), None, None, {'value': value})
+            parent = self.nodes[new_node.parent]
+            if value > parent.data['value']:
+                parent.right = new_node.index
+            else:
+                parent.left = new_node.index
+
+        print('inserting', new_node, 'at', new_node.index)
         self.nodes[new_node.index] = new_node
+
 
     def __str__(self):
         for node in self.nodes:
