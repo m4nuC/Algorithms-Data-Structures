@@ -34,21 +34,38 @@ class BST:
             return 3
         return range(2**level-1, (2**level-2) +1) + self.left_nodes(level+1)
 
-    def get_max(self):
-        node = self.nodes[1] if 1 in self.nodes else None
+    def max(self, start = 1):
+        node = self.nodes[start] if start in self.nodes else None
         last_seen_value = node.data['value']
         while node:
-            last_seen_value = node.data['value']
             node = self.nodes[node.right] if node.right else None
+            last_seen_value = node.data['value'] if node else last_seen_value
         return last_seen_value
 
-    def get_min(self):
-        node = self.nodes[1] if 1 in self.nodes else None
+    def min(self, start = 1):
+        node = self.nodes[start] if start in self.nodes else None
         last_seen_value = node.data['value']
         while node:
             last_seen_value = node.data['value']
             node = self.nodes[node.left] if node.left else None
         return last_seen_value
+
+    def pred(self, value):
+        search_result = self.search(value)
+        if search_result[0] == False: return False
+        node = search_result[1]
+        if node.left:
+            return self.max(node.left)
+        else:
+
+            parent = self.nodes[node.parent]
+            last_seen_value = parent.data['value']
+            while parent and parent.data['value'] >= value:
+                if parent.parent is None: return False
+                parent = self.nodes[parent.parent]
+                last_seen_value = parent.data['value'] if parent else last_seen_value
+            return last_seen_value
+
 
     def search(self, value, current_node = 1):
         node = self.nodes[current_node] if current_node in self.nodes else None
