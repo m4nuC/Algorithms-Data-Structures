@@ -57,7 +57,6 @@ class BST:
         if node.left:
             return self.max(node.left)
         else:
-
             parent = self.nodes[node.parent]
             last_seen_value = parent.data['value']
             while parent and parent.data['value'] >= value:
@@ -65,7 +64,6 @@ class BST:
                 parent = self.nodes[parent.parent]
                 last_seen_value = parent.data['value'] if parent else last_seen_value
             return last_seen_value
-
 
     def search(self, value, current_node = 1):
         node = self.nodes[current_node] if current_node in self.nodes else None
@@ -85,19 +83,56 @@ class BST:
             elif node.data['value'] <= value:
                 node = self.nodes[node.right]  if node.right else None
 
+    def traverse_in_order(self, start = 1):
+        node = self.nodes[start]
+        if node.left:
+            self.traverse_in_order(node.left)
+        print(node.data['value'])
+        if node.right:
+            self.traverse_in_order(node.right)
+
+    def delete(self, i):
+        node = self.nodes[i]
+        parent = self.nodes[node.parent]
+        if not node.left and not node.right:
+            if parent.left == i:
+                parent.left = None
+            else:
+                parent.right = None
+            del self.nodes[i]
+        elif node.left ^ node.right:
+            child = node.left if node.left else node.right
+            child.parent = parent.index
+            if parent.left == i:
+                parent.left = child.index
+            else:
+               parent.right = child.index
+            del self.nodes[i]
+        # two children
+        else:
+            # pred = self.pred(node.data['value'])
+            # pred
+            # pred = node
+            pass
+
+
+
     def insert(self, value):
         search_result = self.search(value)
+        print(search_result)
         new_node = None
         if search_result[0]:
             node = search_result[1]
             last_seen_index = node.index
+            last_seen_parent = node.parent
             while node:
                 last_seen_index = node.index
+                last_seen_parent = node.parent
                 node = self.nodes[node.left] if node.left else None
-            new_node = Node(last_seen_index, math.floor(last_seen_index/2), None, None, {'value': value})
+            new_node = Node(last_seen_index, last_seen_parent, None, None, {'value': value})
             self.nodes[new_node.parent].left = last_seen_index
         else:
-            new_node = Node(search_result[1], math.floor(search_result[1]/2), None, None, {'value': value})
+            new_node = Node(search_result[1],search_result[1]//2, None, None, {'value': value})
             parent = self.nodes[new_node.parent]
             if value > parent.data['value']:
                 parent.right = new_node.index
