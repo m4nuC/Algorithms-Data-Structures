@@ -47,7 +47,6 @@ class Heap:
         return len(self.heap)
 
     def swap(self, i, j):
-        print('swapping {} and {}'.format( self.heap[i], self.heap[j]))
         tmp = self.heap[i]
         self.heap[i] = self.heap[j]
         self.heap[j] = tmp
@@ -66,6 +65,50 @@ class Heap:
             sys.stdout.write('\n')
         return ''
 
+class MaxHeap(Heap):
+    def __init__(self, A = [], value_accessor = lambda x: x):
+        self.value_accessor = value_accessor
+        self.heap = []
+        [self.add(a) for a in A]
+
+    def add(self, x):
+        super().add(x)
+        self.max_heapify_up(self.size()-1)
+
+    def pluck_max(self):
+        if self.size() == 0: return None
+        self.swap(0, self.size()-1)
+        max = self.heap.pop()
+        self.max_heapify_down(0)
+        return max
+
+    def max(self):
+        return self.heap[0] if self.size() > 0 else None
+
+    def pluck(self, i):
+        index, value = self.get_max_child(i)
+        if i == self.size()-1:
+            return self.heap.pop(i)
+        elif index:
+            self.swap(i, index)
+            return self.pluck(index)
+        else:
+            self.swap(i, i+1)
+            return self.pluck(i+1)
+
+    def max_heapify_up(self, i):
+        parent = self.parent(i)
+        if parent is False: return
+        if self.value_accessor(self.heap[i]) > self.value_accessor(self.heap[parent]):
+            self.swap(i, parent)
+            return self.max_heapify_up(parent)
+
+    def max_heapify_down(self, i):
+        index, value = self.get_max_child(i)
+        if index and self.value_accessor(self.heap[i]) < value:
+            self.swap(i, index)
+            return self.max_heapify_down(index)
+
 class MinHeap(Heap):
     def __init__(self, A = [], value_accessor = lambda x: x):
         self.value_accessor = value_accessor
@@ -74,9 +117,13 @@ class MinHeap(Heap):
 
     def add(self, x):
         super().add(x)
-        self.min_heapify_up(self.size()-1)
+        return self.min_heapify_up(self.size()-1)
+
+    def min(self):
+        return self.heap[0] if self.size() > 0 else None
 
     def pluck_min(self):
+        if self.size() == 0: return None
         self.swap(0, self.size()-1)
         min = self.heap.pop()
         self.min_heapify_down(0)
@@ -95,10 +142,11 @@ class MinHeap(Heap):
 
     def min_heapify_up(self, i):
         parent = self.parent(i)
-        if parent is False: return
+        if parent is False: return i
         if self.value_accessor(self.heap[i]) < self.value_accessor(self.heap[parent]):
             self.swap(i, parent)
             return self.min_heapify_up(parent)
+        return i
 
     def min_heapify_down(self, i):
         index, value = self.get_min_child(i)
